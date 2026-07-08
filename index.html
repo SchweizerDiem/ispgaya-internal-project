@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Weather — Documentação do Projeto</title>
+<meta name="description" content="Documentação técnica do sistema Local Weather: agregação de APIs meteorológicas nacionais (IPMA, AEMET, CWA, Open-Meteo).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
+
+<!-- ───────────────────────── SIDEBAR ───────────────────────── -->
+<button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="sidebar">
+  <span></span><span></span><span></span>
+  <span class="sr-only">Abrir navegação</span>
+</button>
+
+<nav class="sidebar" id="sidebar" aria-label="Navegação da documentação">
+  <div class="sidebar-brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" width="26" height="26">
+        <circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M16 4 L16 8 M16 24 L16 28 M4 16 L8 16 M24 16 L28 16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="4.5" fill="currentColor"/>
+      </svg>
+    </span>
+    <div>
+      <p class="brand-name">Local Weather</p>
+      <p class="brand-sub">Documentação técnica</p>
+    </div>
+  </div>
+
+  <div class="sidebar-clock" id="sidebarClock" aria-live="off">
+    <span class="dot" aria-hidden="true"></span>
+    <span id="clockText">--:--:--</span>
+  </div>
+
+  <ul class="sidebar-nav">
+    <li><a href="#visao-geral" data-nav>01 · Visão Geral</a></li>
+    <li><a href="#arquitetura" data-nav>02 · Arquitetura</a></li>
+    <li><a href="#fornecedores" data-nav>03 · Fornecedores</a></li>
+    <li><a href="#endpoints" data-nav>04 · Endpoints REST</a></li>
+    <li><a href="#testes" data-nav>05 · Testes &amp; Qualidade</a></li>
+    <li><a href="#stack" data-nav>06 · Stack Tecnológico</a></li>
+    <li><a href="#ocorrencias" data-nav>07 · Registo de Ocorrências</a></li>
+    <li><a href="#futuro" data-nav>08 · Trabalho Futuro</a></li>
+    <li><a href="#documentacao" data-nav>09 · Documentação</a></li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <a href="https://github.com/" class="repo-link" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      Repositório
+    </a>
+    <p class="footer-meta">Gabriel Jesus da Rocha · ISPGAYA</p>
+  </div>
+</nav>
+
+<div class="nav-scrim" id="navScrim"></div>
+
+<!-- ───────────────────────── MAIN ───────────────────────── -->
+<main id="conteudo">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="eyebrow">Projeto de Final de Curso · Engenharia Informática · ISPGAYA</p>
+      <h1>Local Weather</h1>
+      <p class="hero-lede">
+        Uma plataforma de agregação de APIs meteorológicas nacionais. Em vez de
+        recorrer a um serviço global genérico, o Local Weather fala diretamente
+        com a agência oficial de cada país — IPMA, AEMET, CWA — e cai para o
+        Open-Meteo onde nenhuma delas cobre.
+      </p>
+
+      <div class="board" role="table" aria-label="Fornecedores integrados e cobertura">
+        <div class="board-row board-head" role="row">
+          <span role="columnheader">Fornecedor</span>
+          <span role="columnheader">País / Região</span>
+          <span role="columnheader">Horizonte</span>
+          <span role="columnheader">Estado</span>
+        </div>
+        <div class="board-row" role="row">
+          <span role="cell" class="mono">IPMA</span>
+          <span role="cell">Portugal</span>
+          <span role="cell" class="mono">3 dias</span>
+          <span role="cell"><span class="status-dot"></span>online</span>
+        </div>
+        <div class="board-row" role="row">
+          <span role="cell" class="mono">AEMET</span>
+          <span role="cell">Espanha</span>
+          <span role="cell" class="mono">7 dias / 48h</span>
+          <span role="cell"><span class="status-dot"></span>online</span>
+        </div>
+        <div class="board-row" role="row">
+          <span role="cell" class="mono">CWA</span>
+          <span role="cell">Taiwan</span>
+          <span role="cell" class="mono">7 dias / 36h</span>
+          <span role="cell"><span class="status-dot"></span>online</span>
+        </div>
+        <div class="board-row" role="row">
+          <span role="cell" class="mono">OPEN-METEO</span>
+          <span role="cell">Global (15 países)</span>
+          <span role="cell" class="mono">16 dias</span>
+          <span role="cell"><span class="status-dot"></span>online</span>
+        </div>
+      </div>
+      <p class="board-caption">Última verificação simulada às <span id="heroClock" class="mono">--:--:--</span> — os quatro adaptadores são módulos independentes; nenhum depende do estado dos restantes.</p>
+    </div>
+  </header>
+
+  <!-- 01 VISÃO GERAL -->
+  <section id="visao-geral" class="section">
+    <p class="section-eyebrow">01</p>
+    <h2>Visão Geral</h2>
+    <p class="lede">
+      O utilizador que consulta habitualmente a agência do seu país de residência
+      confronta-se, ao precisar de previsões para outro país, com a necessidade
+      de recorrer a serviços globais genéricos e menos precisos — por desconhecer
+      a existência das agências nacionais de cada região, ou por as encontrar
+      redigidas na língua local. O Local Weather resolve isto centralizando o
+      acesso a quatro fornecedores meteorológicos por trás de uma interface única,
+      sem perder a precisão inerente a cada fonte local.
+    </p>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <p class="stat-num">4</p>
+        <p class="stat-label">fornecedores integrados</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-num">13</p>
+        <p class="stat-label">endpoints REST documentados</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-num">196</p>
+        <p class="stat-label">testes automatizados</p>
+      </div>
+      <div class="stat-card accent">
+        <p class="stat-num">89<span class="stat-unit">%</span></p>
+        <p class="stat-label">cobertura de código</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><strong>Âmbito.</strong> Backend em Python/FastAPI seguindo o padrão
+      <em>Provider Adapter</em> — cada fornecedor encapsulado num módulo isolado,
+      sem dependências cruzadas. Frontend em React, com pesquisa unificada de
+      cidades, geolocalização automática, histórico de pesquisas, unidades
+      configuráveis (°C/°F, km/h/mph), tema claro/escuro e suporte a EN/PT.</p>
+    </div>
+  </section>
+
+  <!-- 02 ARQUITETURA -->
+  <section id="arquitetura" class="section">
+    <p class="section-eyebrow">02</p>
+    <h2>Arquitetura</h2>
+    <p class="lede">
+      Arquitetura cliente-servidor em três camadas lógicas. O <em>browser</em>
+      nunca fala diretamente com os fornecedores externos — evita problemas de
+      CORS e mantém as chaves de API fora do cliente.
+    </p>
+
+    <div class="diagram" role="img" aria-label="Fluxo: Browser React comunica via HTTP com o Backend FastAPI, que por sua vez comunica com Open-Meteo, AEMET, IPMA e CWA.">
+      <div class="diagram-node node-browser">
+        <span class="node-label">Browser</span>
+        <span class="node-sub mono">React</span>
+      </div>
+      <div class="diagram-arrow" aria-hidden="true">
+        <span class="mono">HTTP GET /weather/* · /geo/*</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12h14M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="diagram-node node-backend">
+        <span class="node-label">Backend</span>
+        <span class="node-sub mono">FastAPI · :8000</span>
+      </div>
+      <div class="diagram-arrow" aria-hidden="true">
+        <span class="mono">asyncio.gather()</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12h14M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="diagram-providers">
+        <div class="diagram-node node-provider"><span class="node-label mono">Open-Meteo</span><span class="node-sub">Global</span></div>
+        <div class="diagram-node node-provider"><span class="node-label mono">AEMET</span><span class="node-sub">Espanha</span></div>
+        <div class="diagram-node node-provider"><span class="node-label mono">IPMA</span><span class="node-sub">Portugal</span></div>
+        <div class="diagram-node node-provider"><span class="node-label mono">CWA</span><span class="node-sub">Taiwan</span></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <h3>Camadas do backend</h3>
+        <dl class="def-list">
+          <dt class="mono">models/</dt>
+          <dd>Esquemas Pydantic por fornecedor — sem tentativa de unificação; a diferença entre APIs é preservada, não escondida.</dd>
+          <dt class="mono">providers/</dt>
+          <dd>Toda a comunicação HTTP externa. Cada adaptador expõe apenas funções assíncronas de alto nível (ex. <code>fetch_daily(municipio_id)</code>).</dd>
+          <dt class="mono">routers/</dt>
+          <dd>Endpoints FastAPI, validação Pydantic, chamada aos adaptadores. Nunca fazem chamadas HTTP diretas.</dd>
+        </dl>
+      </div>
+      <div>
+        <h3>Porquê o padrão Adapter</h3>
+        <p>Cada fornecedor tem a sua própria lógica de autenticação, formato de resposta e codificação de texto. O <em>Adapter</em> isola essa especificidade num módulo substituível — adicionar a Météo-France ou o DWD amanhã não implica tocar em nenhum módulo existente, apenas escrever um novo adaptador.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 FORNECEDORES -->
+  <section id="fornecedores" class="section">
+    <p class="section-eyebrow">03</p>
+    <h2>Fornecedores</h2>
+    <p class="lede">Quatro fontes de dados, quatro contratos completamente diferentes.</p>
+
+    <div class="provider-grid">
+
+      <article class="provider-card">
+        <header>
+          <span class="provider-flag" aria-hidden="true">🇵🇹</span>
+          <div>
+            <h3>IPMA</h3>
+            <p class="provider-sub">Instituto Português do Mar e da Atmosfera</p>
+          </div>
+        </header>
+        <ul class="tag-list">
+          <li>Sem autenticação</li>
+          <li>Previsão diária · 3 dias</li>
+          <li>Sem condições atuais</li>
+          <li>Identificação por <span class="mono">globalIdLocal</span></li>
+        </ul>
+        <p class="provider-note">Catálogo estático de cidades (capitais de distrito, Açores, Madeira) mantido em memória — pesquisa instantânea, sem chamada de rede extra.</p>
+      </article>
+
+      <article class="provider-card">
+        <header>
+          <span class="provider-flag" aria-hidden="true">🇪🇸</span>
+          <div>
+            <h3>AEMET</h3>
+            <p class="provider-sub">Agencia Estatal de Meteorología</p>
+          </div>
+        </header>
+        <ul class="tag-list">
+          <li>Requer chave de API</li>
+          <li>Diária · 7 dias / Horária · 48h</li>
+          <li>Sem condições atuais</li>
+          <li>Identificação por código INE</li>
+        </ul>
+        <p class="provider-note">O fornecedor mais complexo: fluxo de dois pedidos HTTP e respostas codificadas em <span class="mono">ISO-8859-1</span>, não UTF-8. Ver Registo de Ocorrências.</p>
+      </article>
+
+      <article class="provider-card">
+        <header>
+          <span class="provider-flag" aria-hidden="true">🇹🇼</span>
+          <div>
+            <h3>CWA</h3>
+            <p class="provider-sub">Central Weather Administration, Taiwan</p>
+          </div>
+        </header>
+        <ul class="tag-list">
+          <li>Requer chave de API</li>
+          <li>Atuais + 36h + Diária · 7 dias</li>
+          <li>22 condados/cidades</li>
+          <li>Vento em classes textuais (mandarim)</li>
+        </ul>
+        <p class="provider-note"><em>Datasets</em> individuais por condado (ex. <span class="mono">F-D0047-063</span> para Taipei) — não existe um identificador global funcional.</p>
+      </article>
+
+      <article class="provider-card">
+        <header>
+          <span class="provider-flag" aria-hidden="true">🌍</span>
+          <div>
+            <h3>Open-Meteo</h3>
+            <p class="provider-sub">Serviço agregador global de código aberto</p>
+          </div>
+        </header>
+        <ul class="tag-list">
+          <li>Sem autenticação (até 10.000 chamadas/dia)</li>
+          <li>Atuais + Horária + Diária · 16 dias</li>
+          <li>15 países no âmbito do projeto</li>
+          <li>Licença CC BY 4.0</li>
+        </ul>
+        <p class="provider-note">O adaptador mais simples: pedido único, sem fluxo multi-fase, sem anomalias de codificação. Serviu de prova de conceito da arquitetura.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 04 ENDPOINTS -->
+  <section id="endpoints" class="section">
+    <p class="section-eyebrow">04</p>
+    <h2>Endpoints REST</h2>
+    <p class="lede">
+      Treze endpoints de dados meteorológicos, documentados automaticamente via
+      OpenAPI/Swagger. Os caminhos de IPMA e CWA seguem a mesma convenção dos
+      restantes módulos.
+    </p>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Método</th><th>Caminho</th><th>Fornecedor</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">GET</td><td class="mono">/weather/open-meteo/city</td><td>Open-Meteo</td><td>Condições atuais</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/open-meteo/city/hourly</td><td>Open-Meteo</td><td>Previsão horária</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/open-meteo/city/daily</td><td>Open-Meteo</td><td>Previsão diária</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/aemet/cities</td><td>AEMET</td><td>Pesquisa de municípios (código INE)</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/aemet/forecast/daily</td><td>AEMET</td><td>Previsão diária (7 dias)</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/aemet/forecast/hourly</td><td>AEMET</td><td>Previsão horária (48h)</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/ipma/cities</td><td>IPMA</td><td>Lista de cidades portuguesas</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/ipma/forecast</td><td>IPMA</td><td>Previsão diária (3 dias)</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/cwa/locations</td><td>CWA</td><td>Lista de condados/cidades</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/cwa/current</td><td>CWA</td><td>Observações atuais</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/cwa/forecast/36h</td><td>CWA</td><td>Previsão de 36 horas</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/weather/cwa/forecast/daily</td><td>CWA</td><td>Previsão diária (7 dias)</td></tr>
+          <tr><td class="mono">GET</td><td class="mono">/geo/reverse</td><td>Nominatim</td><td>Geocodificação inversa (GPS → cidade)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">Documentação interativa completa disponível em <span class="mono">/docs</span> (Swagger UI) e <span class="mono">/redoc</span> quando o backend está em execução local.</p>
+  </section>
+
+  <!-- 05 TESTES -->
+  <section id="testes" class="section">
+    <p class="section-eyebrow">05</p>
+    <h2>Testes &amp; Qualidade</h2>
+    <p class="lede">
+      Nenhum teste realiza chamadas HTTP reais aos fornecedores — todas as
+      respostas são simuladas com <em>payloads</em> realistas. A suite completa
+      corre em cerca de 9 segundos.
+    </p>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Ficheiro</th><th>Tipo</th><th>Testes</th><th>Classes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">test_geocoding.py</td><td>Unitário</td><td>25</td><td>2</td></tr>
+          <tr><td class="mono">providers/test_aemet.py</td><td>Unitário</td><td>44</td><td>8</td></tr>
+          <tr><td class="mono">providers/test_ipma.py</td><td>Unitário</td><td>21</td><td>3</td></tr>
+          <tr><td class="mono">providers/test_cwa.py</td><td>Unitário</td><td>55</td><td>6</td></tr>
+          <tr><td class="mono">test_endpoints.py</td><td>Integração</td><td>51</td><td>5</td></tr>
+          <tr class="total-row"><td>Total</td><td>—</td><td>196</td><td>24</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="progress-block">
+      <p class="progress-label"><span>Cobertura global</span><span class="mono">89%</span></p>
+      <div class="progress-bar"><div class="progress-fill" style="--pct:89%"></div></div>
+      <p class="progress-note">Os módulos com menor cobertura correspondem a ramos de tratamento de erro de difícil simulação — nomeadamente <span class="mono">app/routers/geo.py</span> (35%), por depender de duas chamadas HTTP sequenciais externas (Nominatim e Open-Meteo).</p>
+    </div>
+  </section>
+
+  <!-- 06 STACK -->
+  <section id="stack" class="section">
+    <p class="section-eyebrow">06</p>
+    <h2>Stack Tecnológico</h2>
+
+    <div class="two-col">
+      <div class="stack-block">
+        <h3>Backend</h3>
+        <ul class="stack-list">
+          <li><span class="mono">FastAPI</span> — framework assíncrono, documentação OpenAPI automática</li>
+          <li><span class="mono">Pydantic</span> — validação de esquemas tipificados (núcleo em Rust desde a v2)</li>
+          <li><span class="mono">httpx.AsyncClient</span> — chamadas HTTP paralelas com <span class="mono">asyncio.gather()</span></li>
+          <li><span class="mono">pytest + pytest-asyncio</span> — 196 testes, modo automático</li>
+        </ul>
+      </div>
+      <div class="stack-block">
+        <h3>Frontend</h3>
+        <ul class="stack-list">
+          <li><span class="mono">React</span> — Context API para unidades e idioma (sem Redux)</li>
+          <li><span class="mono">MUI X Charts</span> — visualização horária e diária de temperatura</li>
+          <li><span class="mono">localStorage</span> — histórico de pesquisas, preferências</li>
+          <li><span class="mono">Nominatim (OpenStreetMap)</span> — geocodificação inversa via proxy</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 OCORRÊNCIAS -->
+  <section id="ocorrencias" class="section">
+    <p class="section-eyebrow">07</p>
+    <h2>Registo de Ocorrências</h2>
+    <p class="lede">Os quatro problemas técnicos que mais tempo consumiram durante a integração — e como foram resolvidos.</p>
+
+    <div class="incident-list">
+      <article class="incident">
+        <div class="incident-head">
+          <span class="incident-tag">AEMET</span>
+          <h3>Codificação ISO-8859-1</h3>
+        </div>
+        <p>Erro de <em>parsing</em> JSON que só ocorria para localidades com caracteres especiais espanhóis. Causa: a AEMET codifica as respostas em <span class="mono">ISO-8859-1</span>, enquanto o <span class="mono">httpx</span> assume UTF-8 por omissão — o byte <span class="mono">0xBA</span> (º) corrompia o JSON antes do <em>parsing</em>.</p>
+        <p class="incident-fix"><strong>Resolução:</strong> ler <span class="mono">r.content</span> em bruto e descodificar explicitamente com <span class="mono">.decode("latin-1")</span> antes de <span class="mono">json.loads()</span>.</p>
+      </article>
+
+      <article class="incident">
+        <div class="incident-head">
+          <span class="incident-tag">CWA</span>
+          <h3>Identificador de dataset inválido</h3>
+        </div>
+        <p>A documentação referia <span class="mono">F-D0047-093</span> como identificador global de previsão a 7 dias. Devolvia HTTP 404 de forma consistente — os dados estão, na realidade, organizados por condado, cada um com o seu próprio identificador.</p>
+        <p class="incident-fix"><strong>Resolução:</strong> registo local <span class="mono">CWA_LOCATIONS</span> com o identificador correto para cada um dos 22 condados/cidades.</p>
+      </article>
+
+      <article class="incident">
+        <div class="incident-head">
+          <span class="incident-tag">CORS</span>
+          <h3>Geocodificação inversa via Nominatim</h3>
+        </div>
+        <p>O Nominatim não envia o cabeçalho <span class="mono">Access-Control-Allow-Origin</span>, impedindo chamadas diretas a partir do browser para a funcionalidade de geolocalização automática.</p>
+        <p class="incident-fix"><strong>Resolução:</strong> endpoint proxy <span class="mono">GET /geo/reverse</span> no backend, que chama o Nominatim do lado do servidor.</p>
+      </article>
+
+      <article class="incident">
+        <div class="incident-head">
+          <span class="incident-tag">Testes</span>
+          <h3>Mocking assíncrono</h3>
+        </div>
+        <p>Substituir <span class="mono">httpx.AsyncClient</span> por <span class="mono">AsyncMock</span> produzia <span class="mono">'coroutine' object has no attribute 'get'</span> — <span class="mono">r.json()</span> e <span class="mono">r.raise_for_status()</span> são chamados de forma síncrona, mesmo com cliente assíncrono.</p>
+        <p class="incident-fix"><strong>Resolução:</strong> <span class="mono">MagicMock</span> para esses dois métodos; <span class="mono">AsyncMock</span> apenas onde há <span class="mono">await</span> real. Regra geral adotada: fazer <em>patch</em> onde a função é usada, não onde é definida.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 08 FUTURO -->
+  <section id="futuro" class="section">
+    <p class="section-eyebrow">08</p>
+    <h2>Trabalho Futuro</h2>
+    <p class="lede">Direções identificadas, por ordem decrescente de impacto arquitetural.</p>
+
+    <ol class="roadmap">
+      <li><strong>Endpoint unificado</strong> — <span class="mono">GET /weather/city?city=&#123;nome&#125;</span> com seleção automática de fornecedor no backend, completando o padrão <em>Aggregator</em>.</li>
+      <li><strong>Caching com TTL</strong> — cache em memória diferenciado por tipo de dado (10 min para condições atuais, 3h para previsão diária), protegendo as chaves de API.</li>
+      <li><strong>Expansão de fornecedores</strong> — candidatos: DWD (Alemanha), FMI (Finlândia), INMET (Brasil), Met Office (Reino Unido).</li>
+      <li><strong>Dashboard de saúde dos fornecedores</strong> — <span class="mono">GET /health/providers</span> com tempo de resposta e deteção precoce de alterações de contrato.</li>
+      <li><strong>Comparação de cidades</strong> — duas localizações lado a lado, cada uma pelo seu próprio fornecedor.</li>
+      <li><strong>Análise de precisão histórica</strong> — comparação com a reanálise ERA5 do Open-Meteo desde 1940.</li>
+      <li><strong>Progressive Web App</strong> — service worker para consulta offline da última previsão obtida.</li>
+    </ol>
+  </section>
+
+  <!-- 09 DOCUMENTAÇÃO -->
+  <section id="documentacao" class="section">
+    <p class="section-eyebrow">09</p>
+    <h2>Documentação</h2>
+    <p class="lede">
+      Relatório de estágio e relatórios intercalares mensais, disponíveis para
+      consulta e download.
+    </p>
+
+    <div class="doc-list">
+
+      <article class="doc-card doc-card-featured">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/>
+          </svg>
+        </span>
+        <div class="doc-info">
+          <p class="doc-title">Relatório de Estágio</p>
+          <p class="doc-meta">Relatório final completo · PDF</p>
+        </div>
+        <a class="doc-download" href="documentos/relatorio-final.pdf" download>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Descarregar
+        </a>
+      </article>
+
+      <article class="doc-card">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/>
+          </svg>
+        </span>
+        <div class="doc-info">
+          <p class="doc-title">Relatório Intercalar 1</p>
+          <p class="doc-meta">23 mar – 22 abr 2026 · DOCX</p>
+        </div>
+        <a class="doc-download" href="documentos/relatorio-intercalar-1.docx" download>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Descarregar
+        </a>
+      </article>
+
+      <article class="doc-card">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/>
+          </svg>
+        </span>
+        <div class="doc-info">
+          <p class="doc-title">Relatório Intercalar 2</p>
+          <p class="doc-meta">23 abr – 22 mai 2026 · DOCX</p>
+        </div>
+        <a class="doc-download" href="documentos/relatorio-intercalar-2.docx" download>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Descarregar
+        </a>
+      </article>
+
+      <article class="doc-card">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/>
+          </svg>
+        </span>
+        <div class="doc-info">
+          <p class="doc-title">Relatório Intercalar 3</p>
+          <p class="doc-meta">23 mai – 22 jun 2026 · DOCX</p>
+        </div>
+        <a class="doc-download" href="documentos/relatorio-intercalar-3.docx" download>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Descarregar
+        </a>
+      </article>
+
+      <article class="doc-card">
+        <span class="doc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6M9 9h2"/>
+          </svg>
+        </span>
+        <div class="doc-info">
+          <p class="doc-title">Relatório Intercalar 4</p>
+          <p class="doc-meta">23 jun – 7 jul 2026 · DOCX</p>
+        </div>
+        <a class="doc-download" href="documentos/relatorio-intercalar-4.docx" download>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 10l5 5 5-5M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Descarregar
+        </a>
+      </article>
+
+    </div>
+
+    <p class="table-note">
+      Os ficheiros ficam guardados na pasta <span class="mono">documentos/</span>
+      deste site — consulta o <span class="mono">README.md</span> para saber
+      como adicionar ou renomear os teus próprios ficheiros.
+    </p>
+  </section>
+
+  <footer class="site-footer">
+    <p>Local Weather — Projeto de Final de Curso, Engenharia Informática, ISPGAYA.</p>
+    <p class="footer-small">Gabriel Jesus da Rocha · Orientação: Prof. José Arnaud</p>
+  </footer>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
